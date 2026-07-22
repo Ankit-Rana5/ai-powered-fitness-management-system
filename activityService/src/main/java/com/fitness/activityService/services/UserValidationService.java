@@ -1,0 +1,33 @@
+package com.fitness.activityService.services;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
+
+@Service
+@RequiredArgsConstructor
+@Slf4j
+public class UserValidationService {
+
+    private final WebClient userServiceWebClient;
+
+    public boolean validateUser(String userId) {
+        log.info("Validating user with ID: {}", userId);
+        try {
+            return
+                    userServiceWebClient.get()
+                    .uri("/api/users/{userId}/validate", userId)
+                    .retrieve()
+                    .bodyToMono(Boolean.class)
+                    .block();
+
+        } catch (WebClientResponseException e) {
+            System.out.println("service available nahi hai shayad");
+            e.printStackTrace();
+            // Log the exception (not shown here for brevity)
+            return false; // Treat any exception as validation failure
+        }
+    }
+}
